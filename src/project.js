@@ -116,10 +116,24 @@ async function get_mocked_dependencies(local_dependencies, { temp_path }) {
 	return { mocked_dependencies, packed_dependencies };
 }
 
+async function prepare_dependencies({ types, cwd, temp_path }) {
+	// Save original package.json content
+	const original_package_json = get_package_json({ cwd });
+
+	const local_dependencies = get_local_dependencies(original_package_json, { types });
+
+	// Create the tarballs, and get the mocked dependency paths
+	const { mocked_dependencies, packed_dependencies } = await get_mocked_dependencies(local_dependencies, { temp_path });
+
+	// This contains all the required data to install the dependencies, or only recreate the hardlinks
+	return { original_package_json, local_dependencies, mocked_dependencies, packed_dependencies };
+}
+
 module.exports = {
 	get_package_json,
 	save_package_json,
 	install_project,
 	get_local_dependencies,
 	get_mocked_dependencies,
+	prepare_dependencies,
 };

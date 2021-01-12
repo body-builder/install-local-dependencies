@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "description": "Yet another local dependency installer",
   "main": "index.js",
+  "bin": {
+    "install": "node bin/install.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "install-local-dependencies": "node index.js"
+    "install-local-dependencies": "node bin/install.js"
   },
   "author": "Benedek Káldi",
   "license": "ISC",
