@@ -1,11 +1,13 @@
 const fs = require('fs');
 const pify = require('pify');
+const rimraf = require('rimraf');
 
 const promisified = {
 	fs: {
 		...pify(fs),
 		exists: pify(fs.exists, { errorFirst: false }),
 	},
+	rimraf: pify(rimraf),
 };
 
 /**
@@ -15,6 +17,19 @@ const promisified = {
 async function validate_path(path) {
 	if (!await promisified.fs.exists(path)) {
 		await promisified.fs.mkdir(path, { recursive: true });
+	}
+}
+
+/**
+ * Error-safe `fs.lstat` - returns stats if the file exists, otherwise null
+ * @param file_path
+ * @returns {Promise<*|null>}
+ */
+async function get_file_stats(file_path) {
+	try {
+		return await promisified.fs.lstat(file_path);
+	} catch (e) {
+		return null;
 	}
 }
 
@@ -37,6 +52,7 @@ async function detect_newline_at_eof(path) {
 
 module.exports = {
 	validate_path,
+	get_file_stats,
 	detect_newline_at_eof,
 	promisified,
 };
