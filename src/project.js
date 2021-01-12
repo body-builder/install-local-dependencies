@@ -165,6 +165,22 @@ async function collect_dependencies_files(packed_dependencies, { cwd, modules_pa
 	}));
 }
 
+async function collect_dependencies_files_flat(globed_dependencies) {
+	const all_dependencies_files = await Promise.all(globed_dependencies.map(async (dependency) => {
+		const { local_package_path, installed_package_path, local_package_files } = dependency;
+
+		// Link files
+		return await Promise.all(local_package_files.map(async (file) => {
+			const local_path = path.resolve(local_package_path, file); // A path to the existing file
+			const installed_path = path.resolve(installed_package_path, file); // A path to the new link
+
+			return { local_path, installed_path };
+		}));
+	}));
+
+	return all_dependencies_files.flat();
+}
+
 module.exports = {
 	get_package_json,
 	save_package_json,
@@ -173,4 +189,5 @@ module.exports = {
 	get_mocked_dependencies,
 	prepare_dependencies,
 	collect_dependencies_files,
+	collect_dependencies_files_flat,
 };

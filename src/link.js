@@ -1,5 +1,4 @@
-const path = require('path');
-const { collect_dependencies_files } = require('./project');
+const { collect_dependencies_files, collect_dependencies_files_flat } = require('./project');
 const { promisified, get_file_stats } = require('./helpers');
 
 /**
@@ -13,24 +12,17 @@ async function link_dependencies(packed_dependencies, { cwd, modules_path, ignor
 	// console.log('link_dependencies');
 	const globed_dependencies = await collect_dependencies_files(packed_dependencies, { cwd, modules_path, ignore_list });
 
-	await Promise.all(globed_dependencies.map(async (dependency) => {
-		const { local_package_path, installed_package_path, local_package_files } = dependency;
+	const all_dependencies_files = await collect_dependencies_files_flat(globed_dependencies);
 
-		// Delete files
-		// we should do this in two steps, to avoid possible deletion of already linked files (when a folder gets )
-		await Promise.all(local_package_files.map(async (file) => {
-			const link_path = path.resolve(installed_package_path, file); // A path to the new link
+	// Delete files
+	// we should do this in two steps, to avoid possible deletion of already linked files (when a folder gets )
+	await Promise.all(all_dependencies_files.map(async ({ local_path, installed_path }) => {
+		return unlink_file_or_directory(installed_path);
+	}));
 
-			return unlink_file_or_directory(link_path);
-		}));
-
-		// Link files
-		return await Promise.all(local_package_files.map(async (file) => {
-			const link_target = path.resolve(local_package_path, file); // A path to the existing file
-			const link_path = path.resolve(installed_package_path, file); // A path to the new link
-
-			return link_file_or_directory(link_target, link_path);
-		}));
+	// Link files
+	await Promise.all(all_dependencies_files.map(async ({ local_path, installed_path }) => {
+		return link_file_or_directory(local_path, installed_path);
 	}));
 }
 
