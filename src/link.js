@@ -1,6 +1,5 @@
 const path = require('path');
-const globby = require('globby');
-
+const { collect_dependencies_files } = require('./project');
 const { promisified } = require('./helpers');
 
 /**
@@ -12,32 +11,12 @@ const { promisified } = require('./helpers');
  */
 async function link_dependencies(packed_dependencies, { cwd, modules_path, ignore_list }) {
 	// console.log('link_dependencies');
-	if (!Array.isArray(packed_dependencies)) {
-		throw new Error('No data received to link the dependencies.');
-	}
+	const globed_dependencies = await collect_dependencies_files(packed_dependencies, { cwd, modules_path, ignore_list });
 
-	if (!await promisified.fs.exists(modules_path)) {
-		throw new Error(`Could not find the modules directory. Tried: '${modules_path}'`);
-	}
+	await Promise.all(globed_dependencies.map(async (dependency) => {
+		const { local_package_path, installed_package_path, local_package_files } = dependency;
 
-	await Promise.all(packed_dependencies.map(async (dependency) => {
-		const { local_dependency_name, local_dependency_path } = dependency;
-		const local_package_path = path.resolve(cwd, local_dependency_path); // source
-		const installed_package_path = path.resolve(modules_path, local_dependency_name); // target
-
-		if (!await promisified.fs.exists(installed_package_path)) {
-			throw new Error(`Could not find the installed package '${local_dependency_name}' in '${installed_package_path}'`);
-		}
-
-		const files_to_link = await globby('**/*', {
-			cwd: local_package_path,
-			dot: true,
-			onlyFiles: false,
-			markDirectories: true,
-			ignore: ignore_list,
-		});
-
-		await Promise.all(files_to_link.map((file) => {
+		return await Promise.all(local_package_files.map(async (file) => {
 			const link_target = path.resolve(local_package_path, file); // A path to the existing file
 			const link_path = path.resolve(installed_package_path, file); // A path to the new link
 

@@ -1,5 +1,6 @@
 const path = require('path');
 const execSh = require('exec-sh').promise;
+const globby = require('globby');
 const _ = require('lodash');
 
 const { create_tarball } = require('./dependency');
@@ -129,6 +130,41 @@ async function prepare_dependencies({ types, cwd, temp_path }) {
 	return { original_package_json, local_dependencies, mocked_dependencies, packed_dependencies };
 }
 
+async function collect_dependencies_files(packed_dependencies, { cwd, modules_path, ignore_list }) {
+	// console.log('collect_dependencies_files');
+	if (!Array.isArray(packed_dependencies)) {
+		throw new Error('No data received to link the dependencies.');
+	}
+
+	if (!await promisified.fs.exists(modules_path)) {
+		throw new Error(`Could not find the modules directory. Tried: '${modules_path}'`);
+	}
+
+	return Promise.all(packed_dependencies.map(async (dependency) => {
+		const { local_dependency_name, local_dependency_path } = dependency;
+		const local_package_path = path.resolve(cwd, local_dependency_path); // source
+		const installed_package_path = path.resolve(modules_path, local_dependency_name); // target
+
+		if (!await promisified.fs.exists(installed_package_path)) {
+			throw new Error(`Could not find the installed package '${local_dependency_name}' in '${installed_package_path}'`);
+		}
+
+		const local_package_files = await globby('**/*', {
+			cwd: local_package_path,
+			dot: true,
+			onlyFiles: false,
+			markDirectories: true,
+			ignore: ignore_list,
+		});
+
+		return {
+			local_package_path,
+			installed_package_path,
+			local_package_files,
+		};
+	}));
+}
+
 module.exports = {
 	get_package_json,
 	save_package_json,
@@ -136,4 +172,5 @@ module.exports = {
 	get_local_dependencies,
 	get_mocked_dependencies,
 	prepare_dependencies,
+	collect_dependencies_files,
 };
