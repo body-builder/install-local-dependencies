@@ -1,4 +1,5 @@
 const fs = require('fs');
+const fse = require('fs-extra');
 const pify = require('pify');
 const rimraf = require('rimraf');
 
@@ -7,6 +8,7 @@ const promisified = {
 		...pify(fs),
 		exists: pify(fs.exists, { errorFirst: false }),
 	},
+	fse: pify(fse),
 	rimraf: pify(rimraf),
 };
 

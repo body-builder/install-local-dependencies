@@ -3,7 +3,7 @@ const _ = require('lodash');
 const { cwd, temp_path, modules_path, manager, types, ignore_list } = require('../src/index');
 const { install_project, save_package_json, prepare_dependencies } = require('../src/project');
 const { delete_tarball } = require('../src/dependency');
-const { link_dependencies } = require('../src/link');
+const { copy_dependencies } = require('../src/link');
 
 async function install_and_link() {
 	const { original_package_json, mocked_dependencies, packed_dependencies } = await prepare_dependencies({ types, cwd, temp_path });
@@ -25,8 +25,8 @@ async function install_and_link() {
 	// Restore package.json
 	await save_package_json(original_package_json, { cwd });
 
-	// Link files
-	await link_dependencies(packed_dependencies, { cwd, modules_path, ignore_list });
+	// Copy files from local dependencies to the directories of the installed packages
+	await copy_dependencies(packed_dependencies, { cwd, modules_path, ignore_list });
 
 	return true;
 }
