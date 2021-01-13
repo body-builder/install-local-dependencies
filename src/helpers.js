@@ -42,6 +42,8 @@ async function remove_file_or_directory(file_path) {
 		return;
 	}
 
+	console.log('DELETE', file_path);
+
 	return promisified.rimraf(file_path);
 }
 
@@ -57,6 +59,8 @@ async function copy_file_or_directory(link_target, link_path) {
 	if (is_directory) {
 		return promisified.fs.mkdir(link_path);
 	}
+
+	console.log('COPY', link_target, 'to', link_path);
 
 	return promisified.fse.copy(link_target, link_path);
 }
@@ -78,11 +82,16 @@ async function detect_newline_at_eof(path) {
 	return null;
 }
 
+function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 module.exports = {
 	validate_path,
 	get_file_stats,
 	remove_file_or_directory,
 	copy_file_or_directory,
 	detect_newline_at_eof,
+	sleep,
 	promisified,
 };

@@ -8,11 +8,13 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "install-local-dependencies": "node bin/install.js"
+    "install-local-dependencies": "node bin/install.js",
+    "watch-local-dependencies": "node bin/watch.js"
   },
   "author": "Benedek Káldi",
   "license": "ISC",
   "dependencies": {
+    "chokidar": "^3.5.0",
     "exec-sh": "^0.3.4",
     "find-cache-dir": "^3.3.1",
     "fs-extra": "^9.0.1",

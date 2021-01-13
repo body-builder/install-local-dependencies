@@ -1,10 +1,11 @@
 const path = require('path');
+const chokidar = require('chokidar');
 const execSh = require('exec-sh').promise;
 const globby = require('globby');
 const _ = require('lodash');
 
 const { create_tarball } = require('./dependency');
-const { remove_file_or_directory, copy_file_or_directory, detect_newline_at_eof, promisified } = require('./helpers');
+const { remove_file_or_directory, copy_file_or_directory, detect_newline_at_eof, sleep, promisified } = require('./helpers');
 
 /**
  * Returns the content of the package.json in the `cwd`
@@ -207,6 +208,67 @@ async function copy_dependencies(packed_dependencies, { cwd, modules_path, ignor
 	}));
 }
 
+async function watch_dependencies(packed_dependencies, { cwd, modules_path, ignore_list }) {
+	// console.log('watch_dependencies');
+	const globed_dependencies = await collect_dependencies_files(packed_dependencies, { cwd, modules_path, ignore_list });
+
+	const all_dependencies_files = await collect_dependencies_files_flat(globed_dependencies);
+
+	const files_to_watch = all_dependencies_files.map(({ local_path }) => local_path);
+	const files_to_watch_copy_target = all_dependencies_files.reduce((acc, { local_path, installed_path }) => {
+		acc[`${local_path}`] = installed_path;
+		return acc;
+	}, {});
+
+	const watcher = chokidar.watch(files_to_watch);
+
+	function get_target_path(source_path) {
+		return files_to_watch_copy_target[source_path];
+	}
+
+	async function watch_delayed_log(msg = 'Watching local dependencies for changes', timeout = 1000, clear = true) {
+		await sleep(1000);
+		if (clear) {
+			console.clear();
+		}
+		console.log(msg);
+	}
+
+	watcher
+		.on('ready', async () => {
+			await watch_delayed_log();
+		})
+		.on('add', async (source_path) => {
+			const target_path = get_target_path(source_path);
+			await copy_file_or_directory(source_path, target_path);
+			// await watch_delayed_log(); // We do not need it here, as `ready` already creates a log
+		})
+		.on('change', async (source_path) => {
+			// console.log(source_path, 'changed');
+			const target_path = get_target_path(source_path);
+			await copy_file_or_directory(source_path, target_path);
+			await watch_delayed_log();
+		})
+		.on('unlink', async (source_path) => {
+			// console.log(source_path, 'deleted');
+			const target_path = get_target_path(source_path);
+			await remove_file_or_directory(target_path);
+			await watch_delayed_log();
+		});
+
+	process
+		.on('SIGINT', async () => {
+			// console.log('SIGINT, closing watcher');
+			await watcher.close();
+			console.log('\nLocal dependency watcher gracefully shut down.');
+		})
+		.on('SIGTERM', async () => {
+			// console.log('SIGTERM, closing watcher');
+			await watcher.close();
+			console.log('\nLocal dependency watcher gracefully shut down.');
+		});
+}
+
 module.exports = {
 	get_package_json,
 	save_package_json,
@@ -217,4 +279,5 @@ module.exports = {
 	collect_dependencies_files,
 	collect_dependencies_files_flat,
 	copy_dependencies,
+	watch_dependencies,
 };
