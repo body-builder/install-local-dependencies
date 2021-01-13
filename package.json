@@ -4,12 +4,11 @@
   "description": "Yet another local dependency installer",
   "main": "index.js",
   "bin": {
-    "install": "node bin/install.js"
+    "install-local-dependencies": "bin/install.js",
+    "watch-local-dependencies": "bin/watch.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "install-local-dependencies": "node bin/install.js",
-    "watch-local-dependencies": "node bin/watch.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Benedek Káldi",
   "license": "ISC",
