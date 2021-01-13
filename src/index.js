@@ -14,7 +14,7 @@ const TEMP_packages = [
 ];
 
 const cwd = path.resolve('../projekt');
-const temp_path = find_cache_dir({ directory: cwd, name: 'install-local-dependencies' });
+const temp_path = find_cache_dir({ cwd, name: 'install-local-dependencies' });
 // const temp_path = '../';
 
 const modules_dir = 'node_modules';
