@@ -1,8 +1,10 @@
-const { cwd, temp_path, modules_path, types, ignore_list } = require('../src/config');
+const getConfig = require('../src/config');
 const { prepare_dependencies, watch_dependencies } = require('../src/project');
 const { delete_tarball } = require('../src/dependency');
 
 async function watch() {
+	const { cwd, temp_path, modules_path, manager, types, ignore_list } = await getConfig();
+
 	const { mocked_dependencies, packed_dependencies } = await prepare_dependencies({ types, cwd, temp_path });
 
 	// Delete tarballs

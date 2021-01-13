@@ -1,28 +1,34 @@
 const path = require('path');
+const { cosmiconfig } = require('cosmiconfig');
 const find_cache_dir = require('find-cache-dir');
 
-const cwd = path.resolve('../projekt');
-const temp_path = find_cache_dir({ cwd, name: 'install-local-dependencies' });
-// const temp_path = '../';
+async function config() {
+	const cwd = process.cwd(); // TODO possiblity for process.args
 
-const modules_dir = 'node_modules';
-const modules_path = path.resolve(cwd, modules_dir); // `find-cache-dir` doesn't allow to change this
+	const explorer = cosmiconfig('localdependencies');
+	const result = await explorer.search(cwd);
 
-// const manager = 'npm';
-// const manager = 'yarn';
-const manager = 'pnpm';
-const types = ['dependencies', 'devDependencies'];
+	const { config: project_config } = result || {};
 
-const ignore_list = ['package.json', 'node_modules'];
+	const default_config = {
+		cwd,
+		temp_path: find_cache_dir({ cwd, name: 'install-local-dependencies' }),
+		modules_dir: 'node_modules',
+		manager: 'npm',
+		types: ['dependencies', 'devDependencies'],
+		ignore_list: ['package.json', 'node_modules'],
+	};
 
-// console.log('START', { cwd, temp_path, manager });
+	const config = {
+		...default_config,
+		...project_config,
+	};
 
-module.exports = {
-	cwd,
-	temp_path,
-	modules_dir,
-	modules_path,
-	manager,
-	types,
-	ignore_list,
-};
+	config.modules_path = path.resolve(config.cwd, config.modules_dir); // `find-cache-dir` doesn't allow to change this
+
+	// console.log('START', config);
+
+	return config;
+}
+
+module.exports = config;

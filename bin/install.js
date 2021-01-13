@@ -1,10 +1,12 @@
 const _ = require('lodash');
 
-const { cwd, temp_path, modules_path, manager, types, ignore_list } = require('../src/config');
+const getConfig = require('../src/config');
 const { install_project, save_package_json, prepare_dependencies, copy_dependencies } = require('../src/project');
 const { delete_tarball } = require('../src/dependency');
 
 async function install_and_link() {
+	const { cwd, temp_path, modules_path, manager, types, ignore_list } = await getConfig();
+
 	const { original_package_json, mocked_dependencies, packed_dependencies } = await prepare_dependencies({ types, cwd, temp_path });
 
 	// Mock package.json
