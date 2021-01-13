@@ -35,6 +35,32 @@ async function get_file_stats(file_path) {
 	}
 }
 
+async function remove_file_or_directory(file_path) {
+	const stats = await get_file_stats(file_path);
+
+	if (!stats) {
+		return;
+	}
+
+	return promisified.rimraf(file_path);
+}
+
+async function copy_file_or_directory(link_target, link_path) {
+	const stats = await get_file_stats(link_target);
+
+	if (!stats) {
+		return;
+	}
+
+	const is_directory = stats.isDirectory();
+
+	if (is_directory) {
+		return promisified.fs.mkdir(link_path);
+	}
+
+	return promisified.fse.copy(link_target, link_path);
+}
+
 /**
  * credits: https://github.com/sonicdoe/detect-newline-at-eof
  * @param path {string}
@@ -55,6 +81,8 @@ async function detect_newline_at_eof(path) {
 module.exports = {
 	validate_path,
 	get_file_stats,
+	remove_file_or_directory,
+	copy_file_or_directory,
 	detect_newline_at_eof,
 	promisified,
 };

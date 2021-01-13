@@ -1,9 +1,8 @@
 const _ = require('lodash');
 
 const { cwd, temp_path, modules_path, manager, types, ignore_list } = require('../src/index');
-const { install_project, save_package_json, prepare_dependencies } = require('../src/project');
+const { install_project, save_package_json, prepare_dependencies, copy_dependencies } = require('../src/project');
 const { delete_tarball } = require('../src/dependency');
-const { copy_dependencies } = require('../src/link');
 
 async function install_and_link() {
 	const { original_package_json, mocked_dependencies, packed_dependencies } = await prepare_dependencies({ types, cwd, temp_path });

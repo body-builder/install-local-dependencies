@@ -4,7 +4,7 @@ const globby = require('globby');
 const _ = require('lodash');
 
 const { create_tarball } = require('./dependency');
-const { detect_newline_at_eof, promisified } = require('./helpers');
+const { remove_file_or_directory, copy_file_or_directory, detect_newline_at_eof, promisified } = require('./helpers');
 
 /**
  * Returns the content of the package.json in the `cwd`
@@ -181,6 +181,32 @@ async function collect_dependencies_files_flat(globed_dependencies) {
 	return all_dependencies_files.flat();
 }
 
+
+/**
+ * @param packed_dependencies {array}
+ * @param cwd {string}
+ * @param modules_path {string}
+ * @param ignore_list {string}
+ * @returns {Promise<void>}
+ */
+async function copy_dependencies(packed_dependencies, { cwd, modules_path, ignore_list }) {
+	// console.log('copy_dependencies');
+	const globed_dependencies = await collect_dependencies_files(packed_dependencies, { cwd, modules_path, ignore_list });
+
+	const all_dependencies_files = await collect_dependencies_files_flat(globed_dependencies);
+
+	// Delete files
+	// we should do this in two steps, to avoid possible deletion of already linked files (when a folder gets )
+	await Promise.all(all_dependencies_files.map(async ({ local_path, installed_path }) => {
+		return remove_file_or_directory(installed_path);
+	}));
+
+	// Link files
+	await Promise.all(all_dependencies_files.map(async ({ local_path, installed_path }) => {
+		return copy_file_or_directory(local_path, installed_path);
+	}));
+}
+
 module.exports = {
 	get_package_json,
 	save_package_json,
@@ -190,4 +216,5 @@ module.exports = {
 	prepare_dependencies,
 	collect_dependencies_files,
 	collect_dependencies_files_flat,
+	copy_dependencies,
 };
