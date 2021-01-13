@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-const { cwd, temp_path, modules_path, manager, types, ignore_list } = require('../src/index');
+const { cwd, temp_path, modules_path, manager, types, ignore_list } = require('../src/config');
 const { install_project, save_package_json, prepare_dependencies, copy_dependencies } = require('../src/project');
 const { delete_tarball } = require('../src/dependency');
 

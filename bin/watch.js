@@ -1,4 +1,4 @@
-const { cwd, temp_path, modules_path, types, ignore_list } = require('../src/index');
+const { cwd, temp_path, modules_path, types, ignore_list } = require('../src/config');
 const { prepare_dependencies, watch_dependencies } = require('../src/project');
 const { delete_tarball } = require('../src/dependency');
 

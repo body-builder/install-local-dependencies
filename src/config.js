@@ -1,17 +1,5 @@
-// OK find packages (from package.json, eg. link:../@webolucio/core)
-// OK create package tarball to node_modules/.cache (package-name.tar -> package/package.json)
-// OK install tarball
-// OK remove tarball
-// create links for the rest of the files (blacklist with node_modules, package.json)
-// OK restore link: or file: in package.json
-
 const path = require('path');
 const find_cache_dir = require('find-cache-dir');
-
-const TEMP_packages = [
-	'@webolucio/core',
-	'@webolucio/rc',
-];
 
 const cwd = path.resolve('../projekt');
 const temp_path = find_cache_dir({ cwd, name: 'install-local-dependencies' });
