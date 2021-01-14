@@ -5,7 +5,7 @@ const { delete_tarball } = require('../src/dependency');
 async function watch() {
 	const { cwd, temp_path, modules_path, manager, types, ignore_list } = await getConfig();
 
-	const { mocked_dependencies, packed_dependencies } = await prepare_dependencies({ types, cwd, temp_path });
+	const { mocked_dependencies, packed_dependencies } = await prepare_dependencies({ types, cwd, temp_path, ignore_list });
 
 	// Delete tarballs
 	await Promise.all(packed_dependencies.map(({ tarball_name }) => delete_tarball(tarball_name, { temp_path })));

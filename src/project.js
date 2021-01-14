@@ -94,9 +94,10 @@ function get_local_dependencies(package_json_content, { types }) {
 /**
  * @param local_dependencies {object}
  * @param temp_path {string}
+ * @param ignore_list {string[]}
  * @returns {Promise<{mocked_dependencies, created_tarballs: []}>}
  */
-async function get_mocked_dependencies(local_dependencies, { temp_path }) {
+async function get_mocked_dependencies(local_dependencies, { temp_path, ignore_list }) {
 	const mocked_dependencies = _.cloneDeep(local_dependencies);
 	const packed_dependencies = [];
 
@@ -105,7 +106,7 @@ async function get_mocked_dependencies(local_dependencies, { temp_path }) {
 		const type_object = local_dependencies[type];
 
 		return await Promise.all(Object.entries(type_object).map(async ([name, version]) => {
-			const tarball = await create_tarball({ name, version }, { temp_path });
+			const tarball = await create_tarball({ name, version }, { temp_path, ignore_list });
 
 			mocked_dependencies[type][name] = tarball.tarball_path;
 
@@ -118,14 +119,14 @@ async function get_mocked_dependencies(local_dependencies, { temp_path }) {
 	return { mocked_dependencies, packed_dependencies };
 }
 
-async function prepare_dependencies({ types, cwd, temp_path }) {
+async function prepare_dependencies({ types, cwd, temp_path, ignore_list }) {
 	// Save original package.json content
 	const original_package_json = get_package_json({ cwd });
 
 	const local_dependencies = get_local_dependencies(original_package_json, { types });
 
 	// Create the tarballs, and get the mocked dependency paths
-	const { mocked_dependencies, packed_dependencies } = await get_mocked_dependencies(local_dependencies, { temp_path });
+	const { mocked_dependencies, packed_dependencies } = await get_mocked_dependencies(local_dependencies, { temp_path, ignore_list });
 
 	// This contains all the required data to install the dependencies, or only recreate the hardlinks
 	return { original_package_json, local_dependencies, mocked_dependencies, packed_dependencies };
@@ -142,21 +143,13 @@ async function collect_dependencies_files(packed_dependencies, { cwd, modules_pa
 	}
 
 	return Promise.all(packed_dependencies.map(async (dependency) => {
-		const { local_dependency_name, local_dependency_path } = dependency;
+		const { local_dependency_name, local_dependency_path, local_package_files } = dependency;
 		const local_package_path = path.resolve(cwd, local_dependency_path); // source
 		const installed_package_path = path.resolve(modules_path, local_dependency_name); // target
 
 		if (!await promisified.fs.exists(installed_package_path)) {
 			throw new Error(`Could not find the installed package '${local_dependency_name}' in '${installed_package_path}'`);
 		}
-
-		const local_package_files = await globby('**/*', {
-			cwd: local_package_path,
-			dot: true,
-			onlyFiles: false,
-			markDirectories: true,
-			ignore: ignore_list,
-		});
 
 		return {
 			local_package_path,

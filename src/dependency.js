@@ -1,4 +1,5 @@
 const path = require('path');
+const globby = require('globby');
 const tar = require('tar');
 const execSh = require('exec-sh').promise;
 
@@ -54,9 +55,10 @@ function filename_from_package_name(name, version) {
  * @param local_dependency_name
  * @param local_dependency_path
  * @param temp_path
+ * @param ignore_list
  * @returns {Promise<string>}
  */
-async function create_tarball({ name: local_dependency_name, version: local_dependency_path }, { temp_path }) {
+async function create_tarball({ name: local_dependency_name, version: local_dependency_path }, { temp_path, ignore_list }) {
 	// console.log('create_tarball', local_dependency_path);
 	const { package_path, package_json_filename, package_json_content } = await get_package_details(local_dependency_path);
 
@@ -64,6 +66,14 @@ async function create_tarball({ name: local_dependency_name, version: local_depe
 
 	const tarball_name = `${filename_from_package_name(package_name, package_version)}.tgz`;
 	const tarball_path = path.resolve(temp_path, tarball_name);
+
+	const local_package_files = await globby('**/*', {
+		cwd: package_path,
+		dot: true,
+		onlyFiles: false,
+		markDirectories: true,
+		ignore: ignore_list,
+	});
 
 	try {
 		await validate_path(temp_path);
@@ -73,7 +83,7 @@ async function create_tarball({ name: local_dependency_name, version: local_depe
 				file: tarball_path,
 				gzip: true,
 			},
-			[package_json_filename],
+			[package_json_filename, ...local_package_files],
 		);
 	} catch (e) {
 		console.log(e);
@@ -84,7 +94,7 @@ async function create_tarball({ name: local_dependency_name, version: local_depe
 		throw new Error(`Could not locate the created tarball '${tarball_name}' in '${temp_path}'.`);
 	}
 
-	return { package_name, package_version, tarball_name, tarball_path, local_dependency_name, local_dependency_path };
+	return { package_name, package_version, local_package_files, tarball_name, tarball_path, local_dependency_name, local_dependency_path };
 }
 
 /**
