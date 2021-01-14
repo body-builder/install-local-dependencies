@@ -1,7 +1,6 @@
 const path = require('path');
 const chokidar = require('chokidar');
 const execSh = require('exec-sh').promise;
-const globby = require('globby');
 const _ = require('lodash');
 
 const { create_tarball } = require('./dependency');
@@ -205,18 +204,33 @@ async function watch_dependencies(packed_dependencies, { cwd, modules_path, igno
 	// console.log('watch_dependencies');
 	const globed_dependencies = await collect_dependencies_files(packed_dependencies, { cwd, modules_path, ignore_list });
 
-	const all_dependencies_files = await collect_dependencies_files_flat(globed_dependencies);
+	const files_to_watch = globed_dependencies.map(({ local_package_path }) => `${local_package_path}/.`);
+	const ignore_glob = `{${ignore_list.map((rule) => `**/${rule}`).join(',')}}`;
 
-	const files_to_watch = all_dependencies_files.map(({ local_path }) => local_path);
-	const files_to_watch_copy_target = all_dependencies_files.reduce((acc, { local_path, installed_path }) => {
-		acc[`${local_path}`] = installed_path;
-		return acc;
-	}, {});
+	const watcher = chokidar.watch(files_to_watch, {
+		ignored: ignore_glob,
+	});
 
-	const watcher = chokidar.watch(files_to_watch);
-
+	/**
+	 * Find the package to which the requested file belongs to
+	 * @param source_path
+	 * @returns {{filename: string, source_path, target_path: string}}
+	 */
 	function get_target_path(source_path) {
-		return files_to_watch_copy_target[source_path];
+		const parent_dependency = globed_dependencies.find(({ local_package_path }) => source_path.startsWith(local_package_path));
+
+		if (!parent_dependency) {
+			throw new Error(`Could not find the package to which the file belongs to: '${source_path}'`);
+		}
+
+		const filename = path.relative(parent_dependency.local_package_path, source_path);
+		const target_path = path.resolve(parent_dependency.installed_package_path, filename);
+
+		return {
+			source_path,
+			filename,
+			target_path,
+		};
 	}
 
 	async function watch_delayed_log(msg = 'Watching local dependencies for changes', timeout = 1000, clear = true) {
@@ -232,19 +246,19 @@ async function watch_dependencies(packed_dependencies, { cwd, modules_path, igno
 			await watch_delayed_log();
 		})
 		.on('add', async (source_path) => {
-			const target_path = get_target_path(source_path);
+			const { target_path } = get_target_path(source_path);
 			await copy_file_or_directory(source_path, target_path);
 			// await watch_delayed_log(); // We do not need it here, as `ready` already creates a log
 		})
 		.on('change', async (source_path) => {
 			// console.log(source_path, 'changed');
-			const target_path = get_target_path(source_path);
+			const { target_path } = get_target_path(source_path);
 			await copy_file_or_directory(source_path, target_path);
 			await watch_delayed_log();
 		})
 		.on('unlink', async (source_path) => {
 			// console.log(source_path, 'deleted');
-			const target_path = get_target_path(source_path);
+			const { target_path } = get_target_path(source_path);
 			await remove_file_or_directory(target_path);
 			await watch_delayed_log();
 		});
