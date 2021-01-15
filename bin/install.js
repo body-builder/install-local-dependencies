@@ -14,7 +14,7 @@ async function install_and_link() {
 
 	if (!Object.keys(mocked_dependencies).length) {
 		// No local dependencies listed in package.json, exit
-		return false;
+		return null;
 	}
 
 	// Install
@@ -26,11 +26,18 @@ async function install_and_link() {
 	// Restore package.json
 	await save_package_json(original_package_json, { cwd });
 
-	return true;
+	return packed_dependencies;
 }
 
 install_and_link()
-	.then((installed) => installed && console.log('Local dependencies installed'))
+	.then((packed_dependencies) => {
+		if (packed_dependencies) {
+			console.log('Local dependencies installed');
+			console.log(packed_dependencies.map(({ package_name, package_version }) => `+ ${package_name} (${package_version})`).join('\n'))
+		} else {
+			console.log('No local dependencies found to install')
+		}
+	})
 	.catch((e) => {
-		console.error('Something went wrong when watching local dependencies', '\n', e);
+		console.error('Something went wrong during the installation of the local dependencies', '\n', e);
 	});

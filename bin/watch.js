@@ -12,14 +12,22 @@ async function watch() {
 
 	if (!Object.keys(mocked_dependencies).length) {
 		// No local dependencies listed in package.json, exit
-		return false;
+		return null;
 	}
 
 	await watch_dependencies(packed_dependencies, { cwd, modules_path, ignore_list });
+
+	return packed_dependencies;
 }
 
 watch()
-	.then((installed) => installed && console.log('Watching local dependencies'))
+	.then((packed_dependencies) => {
+		if (packed_dependencies) {
+			console.log('Starting the local dependency watcher...');
+		} else {
+			console.log('No local dependencies found to watch')
+		}
+	})
 	.catch((e) => {
-		console.error('Something went wrong while watching local dependencies', '\n', e);
+		console.error('Something went wrong during watching the local dependencies', '\n', e);
 	});
