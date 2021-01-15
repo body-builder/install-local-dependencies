@@ -20,14 +20,15 @@ async function install_and_link() {
 		return null;
 	}
 
+	// Restore package.json (we do not want to wait for the end of the install script, to minimize the chance for the mocked
+	// content to remain in the package.json file, if something goes wrong, or the client terminates the install process)
+	setTimeout(() => save_package_json(original_package_json, { cwd }), 1000);
+
 	// Install
 	await install_project({ cwd, manager });
 
 	// Delete tarballs
 	await Promise.all(packed_dependencies.map(({ tarball_name }) => delete_tarball(tarball_name, { temp_path })));
-
-	// Restore package.json
-	await save_package_json(original_package_json, { cwd });
 
 	return packed_dependencies;
 }
