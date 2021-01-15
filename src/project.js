@@ -4,7 +4,7 @@ const execSh = require('exec-sh').promise;
 const _ = require('lodash');
 
 const { create_tarball } = require('./dependency');
-const { remove_file_or_directory, copy_file_or_directory, detect_newline_at_eof, sleep, promisified } = require('./helpers');
+const { remove_file_or_directory, copy_file_or_directory, detect_newline_at_eof, sleep, promisified, color_log, console_colors } = require('./helpers');
 
 /**
  * Returns the content of the package.json in the `cwd`
@@ -241,7 +241,7 @@ async function watch_dependencies(packed_dependencies, { cwd, modules_path, igno
 			console.clear();
 		}
 		console.log(msg);
-		console.log(globed_dependencies.map(({ local_dependency_name }) => `${local_dependency_name}`).join('\n'))
+		console.log(color_log(globed_dependencies.map(({ local_dependency_name }) => `${local_dependency_name}`).join('\n'), console_colors.FgBrightBlack))
 	}
 
 	let isReady = false;
@@ -255,20 +255,20 @@ async function watch_dependencies(packed_dependencies, { cwd, modules_path, igno
 			const { target_path, package_name, filename } = get_target_path(source_path);
 			await copy_file_or_directory(source_path, target_path);
 			if (isReady) {
-				console.log(`${package_name}/${filename}`, 'added');
+				console.log(color_log(`${package_name}/${filename}`, console_colors.FgGreen), 'added');
 				await watch_delayed_log(); // We do not need it here, as `ready` already creates a log
 			}
 		})
 		.on('change', async (source_path) => {
 			const { target_path, package_name, filename } = get_target_path(source_path);
 			await copy_file_or_directory(source_path, target_path);
-			console.log(`${package_name}/${filename}`, 'changed');
+			console.log(color_log(`${package_name}/${filename}`, console_colors.FgYellow), 'changed');
 			await watch_delayed_log();
 		})
 		.on('unlink', async (source_path) => {
 			const { target_path, package_name, filename } = get_target_path(source_path);
 			await remove_file_or_directory(target_path);
-			console.log(`${package_name}/${filename}`, 'deleted');
+			console.log(color_log(`${package_name}/${filename}`, console_colors.FgRed), 'deleted');
 			await watch_delayed_log();
 		});
 

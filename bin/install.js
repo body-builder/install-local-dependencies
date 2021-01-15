@@ -3,6 +3,7 @@ const _ = require('lodash');
 const getConfig = require('../src/config');
 const { install_project, save_package_json, prepare_dependencies } = require('../src/project');
 const { delete_tarball } = require('../src/dependency');
+const { color_log, console_colors } = require('../src/helpers');
 
 async function install_and_link() {
 	const { cwd, temp_path, modules_path, manager, types, ignore_list } = await getConfig();
@@ -33,7 +34,7 @@ install_and_link()
 	.then((packed_dependencies) => {
 		if (packed_dependencies) {
 			console.log('Local dependencies installed');
-			console.log(packed_dependencies.map(({ package_name, package_version }) => `+ ${package_name} (${package_version})`).join('\n'))
+			console.log(packed_dependencies.map(({ package_name, package_version }) => `${color_log('+', console_colors.FgGreen)} ${package_name} ${color_log(`(${package_version})`, console_colors.FgBrightBlack)}`).join('\n'))
 		} else {
 			console.log('No local dependencies found to install')
 		}
