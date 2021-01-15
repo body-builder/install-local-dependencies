@@ -1,6 +1,7 @@
 const path = require('path');
 const { cosmiconfig } = require('cosmiconfig');
 const find_cache_dir = require('find-cache-dir');
+const this_package_json = require('../package.json');
 
 async function config() {
 	const cwd = process.cwd(); // TODO possiblity for process.args
@@ -17,6 +18,7 @@ async function config() {
 		manager: 'npm',
 		types: ['dependencies', 'devDependencies'],
 		ignore_list: ['package.json', 'node_modules'],
+		ignored_packages: [],
 	};
 
 	const config = {
@@ -25,6 +27,7 @@ async function config() {
 	};
 
 	config.modules_path = path.resolve(config.cwd, config.modules_dir); // `find-cache-dir` doesn't allow to change this
+	config.ignored_packages = config.ignored_packages.concat(this_package_json.name); // This plugin should not touch itself
 
 	// console.log('START', config);
 

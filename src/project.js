@@ -65,9 +65,10 @@ async function install_project({ cwd, manager }) {
  * Returns the items of the dependencies/devDependencies object(s), wh
  * @param package_json_content
  * @param types The dependency types to analyze (eg. `dependencies`, `devDependencies`)
+ * @param ignored_packages Array of package names to ignore (based on the name of the package in the project's package.json)
  * @returns {{}}
  */
-function get_local_dependencies(package_json_content, { types }) {
+function get_local_dependencies(package_json_content, { types, ignored_packages }) {
 	const local_packages = {};
 
 	// Iterate over `dependencies`, `devDependencies` object
@@ -80,7 +81,7 @@ function get_local_dependencies(package_json_content, { types }) {
 
 		// Iterate over the packages
 		Object.entries(type_object).forEach(([name, version]) => {
-			if (is_local_package(version)) {
+			if (is_local_package(version) && !ignored_packages.includes(name)) {
 				local_packages[type] = local_packages[type] || {};
 				local_packages[type][name] = get_local_package_path(version);
 			}
@@ -109,7 +110,7 @@ async function get_mocked_dependencies(local_dependencies, { temp_path, ignore_l
 
 			mocked_dependencies[type][name] = tarball.tarball_path;
 
-			if (packed_dependencies.indexOf(tarball.tarball_path) === -1) {
+			if (!packed_dependencies.includes(tarball.tarball_path)) {
 				packed_dependencies.push(tarball);
 			}
 		}));
@@ -118,11 +119,11 @@ async function get_mocked_dependencies(local_dependencies, { temp_path, ignore_l
 	return { mocked_dependencies, packed_dependencies };
 }
 
-async function prepare_dependencies({ types, cwd, temp_path, ignore_list }) {
+async function prepare_dependencies({ types, cwd, temp_path, ignore_list, ignored_packages }) {
 	// Save original package.json content
 	const original_package_json = get_package_json({ cwd });
 
-	const local_dependencies = get_local_dependencies(original_package_json, { types });
+	const local_dependencies = get_local_dependencies(original_package_json, { types, ignored_packages });
 
 	// Create the tarballs, and get the mocked dependency paths
 	const { mocked_dependencies, packed_dependencies } = await get_mocked_dependencies(local_dependencies, { temp_path, ignore_list });
