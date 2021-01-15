@@ -8,9 +8,9 @@ const { delete_tarball } = require('../src/dependency');
 const { color_log, console_colors } = require('../src/helpers');
 
 async function install_and_link() {
-	const { cwd, temp_path, modules_path, manager, types, ignore_list, ignored_packages } = await getConfig();
+	const { cwd, temp_path, modules_path, manager, types, ignored_files, ignored_packages } = await getConfig();
 
-	const { original_package_json, mocked_dependencies, packed_dependencies } = await prepare_dependencies({ types, cwd, temp_path, ignore_list, ignored_packages });
+	const { original_package_json, mocked_dependencies, packed_dependencies } = await prepare_dependencies({ types, cwd, temp_path, ignored_files, ignored_packages });
 
 	// Mock package.json
 	await save_package_json(_.merge({}, original_package_json, mocked_dependencies), { cwd });

@@ -17,7 +17,7 @@ async function config() {
 		modules_dir: 'node_modules',
 		manager: 'npm',
 		types: ['dependencies', 'devDependencies'],
-		ignore_list: ['package.json', 'node_modules'],
+		ignored_files: ['package.json', 'node_modules'],
 		ignored_packages: [],
 	};
 
