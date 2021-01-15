@@ -235,7 +235,7 @@ async function watch_dependencies(packed_dependencies, { cwd, modules_path, igno
 		};
 	}
 
-	async function watch_delayed_log(msg = 'Watching local dependencies for changes', timeout = 1000, clear = true) {
+	async function watch_idle_log(msg = 'Watching local dependencies for changes', timeout = 1000, clear = true) {
 		await sleep(1000);
 		if (clear) {
 			console.clear();
@@ -246,42 +246,46 @@ async function watch_dependencies(packed_dependencies, { cwd, modules_path, igno
 
 	let isReady = false;
 
+	async function close_watcher() {
+		await watcher.close();
+		console.log('\nLocal dependency watcher gracefully shut down.');
+	}
+
 	watcher
 		.on('ready', async () => {
-			await watch_delayed_log();
+			await watch_idle_log();
 			isReady = true;
 		})
 		.on('add', async (source_path) => {
 			const { target_path, package_name, filename } = get_target_path(source_path);
 			await copy_file_or_directory(source_path, target_path);
+			// Do not pollute the console with the bootstrapping data
 			if (isReady) {
 				console.log(color_log(`${package_name}/${filename}`, console_colors.FgGreen), 'added');
-				await watch_delayed_log(); // We do not need it here, as `ready` already creates a log
+				await watch_idle_log();
 			}
 		})
 		.on('change', async (source_path) => {
 			const { target_path, package_name, filename } = get_target_path(source_path);
 			await copy_file_or_directory(source_path, target_path);
 			console.log(color_log(`${package_name}/${filename}`, console_colors.FgYellow), 'changed');
-			await watch_delayed_log();
+			await watch_idle_log();
 		})
 		.on('unlink', async (source_path) => {
 			const { target_path, package_name, filename } = get_target_path(source_path);
 			await remove_file_or_directory(target_path);
 			console.log(color_log(`${package_name}/${filename}`, console_colors.FgRed), 'deleted');
-			await watch_delayed_log();
+			await watch_idle_log();
 		});
 
 	process
 		.on('SIGINT', async () => {
 			// console.log('SIGINT, closing watcher');
-			await watcher.close();
-			console.log('\nLocal dependency watcher gracefully shut down.');
+			await close_watcher();
 		})
 		.on('SIGTERM', async () => {
 			// console.log('SIGTERM, closing watcher');
-			await watcher.close();
-			console.log('\nLocal dependency watcher gracefully shut down.');
+			await close_watcher();
 		});
 }
 
