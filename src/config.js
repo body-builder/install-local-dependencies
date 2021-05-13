@@ -16,6 +16,7 @@ async function config() {
 		temp_path: find_cache_dir({ cwd, name: 'install-local-dependencies' }),
 		modules_dir: 'node_modules',
 		manager: 'npm',
+		install_args: '',
 		types: ['dependencies', 'devDependencies'],
 		ignored_files: ['package.json', 'node_modules'],
 		ignored_packages: [],

@@ -8,7 +8,7 @@ const { delete_tarball } = require('../src/dependency');
 const { color_log, console_colors } = require('../src/helpers');
 
 async function install_and_link() {
-	const { cwd, temp_path, modules_path, manager, types, ignored_files, ignored_packages } = await getConfig();
+	const { cwd, temp_path, modules_path, manager, install_args, types, ignored_files, ignored_packages } = await getConfig();
 
 	const { original_package_json, mocked_dependencies, packed_dependencies } = await prepare_dependencies({ types, cwd, temp_path, ignored_files, ignored_packages });
 
@@ -25,7 +25,7 @@ async function install_and_link() {
 	setTimeout(() => save_package_json(original_package_json, { cwd }), 1000);
 
 	// Install
-	await install_project({ cwd, manager });
+	await install_project({ cwd, manager, install_args });
 
 	// Delete tarballs
 	await Promise.all(packed_dependencies.map(({ tarball_name }) => delete_tarball(tarball_name, { temp_path })));

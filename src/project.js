@@ -51,10 +51,10 @@ function get_local_package_path(version) {
  * @param manager
  * @returns {Promise<void>}
  */
-async function install_project({ cwd, manager }) {
+async function install_project({ cwd, manager, install_args }) {
 	// console.log('install_project');
 	try {
-		await execSh(`${manager} install`, { cwd });
+		await execSh(`${manager} install ${install_args}`, { cwd });
 	} catch (e) {
 		console.log(e);
 		throw new Error(`Could not run '${manager} install' script in ${cwd}`);
