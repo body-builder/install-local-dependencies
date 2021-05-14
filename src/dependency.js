@@ -60,7 +60,11 @@ function filename_from_package_name(name, version) {
  */
 async function create_tarball({ name: local_dependency_name, version: local_dependency_path }, { temp_path, ignored_files }) {
 	// console.log('create_tarball', local_dependency_path);
-	const { package_path, package_json_filename, package_json_content } = await get_package_details(local_dependency_path);
+	const {
+		package_path,
+		package_json_filename,
+		package_json_content,
+	} = await get_package_details(local_dependency_path);
 
 	const { name: package_name, version: package_version } = package_json_content;
 
@@ -94,7 +98,15 @@ async function create_tarball({ name: local_dependency_name, version: local_depe
 		throw new Error(`Could not locate the created tarball '${tarball_name}' in '${temp_path}'.`);
 	}
 
-	return { package_name, package_version, local_package_files, tarball_name, tarball_path, local_dependency_name, local_dependency_path };
+	return {
+		package_name,
+		package_version,
+		local_package_files,
+		tarball_name,
+		tarball_path,
+		local_dependency_name,
+		local_dependency_path,
+	};
 }
 
 /**
