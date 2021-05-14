@@ -2,7 +2,21 @@
   "name": "install-local-dependencies",
   "version": "0.1.0",
   "description": "Yet another local dependency installer",
-  "main": "index.js",
+  "homepage": "https://github.com/body-builder/install-local-dependencies#readme",
+  "repository": "https://github.com/body-builder/install-local-dependencies",
+  "bugs": {
+    "url": "https://github.com/body-builder/install-local-dependencies/issues"
+  },
+  "keywords": [
+    "npm",
+    "yarn",
+    "pnpm",
+    "install",
+    "link",
+    "dependency",
+    "local",
+    "local-dependency"
+  ],
   "bin": {
     "install-local-dependencies": "./bin/install.js",
     "watch-local-dependencies": "./bin/watch.js"
