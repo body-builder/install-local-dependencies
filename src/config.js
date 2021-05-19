@@ -13,7 +13,7 @@ async function config() {
 
 	const default_config = {
 		cwd,
-		temp_path: find_cache_dir({ cwd, name: 'install-local-dependencies' }),
+		temp_path: find_cache_dir({ cwd, name: this_package_json.name }),
 		modules_dir: 'node_modules',
 		manager: 'npm',
 		install_args: '',
