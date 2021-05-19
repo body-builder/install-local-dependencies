@@ -7,7 +7,7 @@ const { install_project, save_package_json, prepare_dependencies } = require('..
 const { delete_tarball } = require('../src/dependency');
 const { color_log, console_colors } = require('../src/helpers');
 
-async function install_and_link() {
+async function install() {
 	const {
 		cwd,
 		temp_path,
@@ -48,7 +48,7 @@ async function install_and_link() {
 	return packed_dependencies;
 }
 
-install_and_link()
+install()
 	.then((packed_dependencies) => {
 		if (packed_dependencies) {
 			console.log('Local dependencies installed');

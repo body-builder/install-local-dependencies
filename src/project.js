@@ -139,14 +139,14 @@ async function prepare_dependencies({ types, cwd, temp_path, ignored_files, igno
 		ignored_files,
 	});
 
-	// This contains all the required data to install the dependencies, or only recreate the hardlinks
+	// This contains all the required data to install the dependencies, or start the watcher
 	return { original_package_json, local_dependencies, mocked_dependencies, packed_dependencies };
 }
 
 async function collect_dependencies_files(packed_dependencies, { cwd, modules_path, ignored_files }) {
 	// console.log('collect_dependencies_files');
 	if (!Array.isArray(packed_dependencies)) {
-		throw new Error('No data received to link the dependencies.');
+		throw new Error('No data received to install the dependencies.');
 	}
 
 	if (!await promisified.fs.exists(modules_path)) {
@@ -177,8 +177,8 @@ async function collect_dependencies_files_flat(globed_dependencies) {
 
 		// Link files
 		return await Promise.all(local_package_files.map(async (file) => {
-			const local_path = path.resolve(local_package_path, file); // A path to the existing file
-			const installed_path = path.resolve(installed_package_path, file); // A path to the new link
+			const local_path = path.resolve(local_package_path, file); // The path to the source file
+			const installed_path = path.resolve(installed_package_path, file); // The path to the file in the installed package
 
 			return { local_path, installed_path };
 		}));
@@ -206,12 +206,12 @@ async function copy_dependencies(packed_dependencies, { cwd, modules_path, ignor
 	const all_dependencies_files = await collect_dependencies_files_flat(globed_dependencies);
 
 	// Delete files
-	// we should do this in two steps, to avoid possible deletion of already linked files (when a folder gets )
+	// we should do this in two steps, to avoid possible deletion of already copied files (when a folder gets )
 	await Promise.all(all_dependencies_files.map(async ({ local_path, installed_path }) => {
 		return remove_file_or_directory(installed_path);
 	}));
 
-	// Link files
+	// Copy files
 	await Promise.all(all_dependencies_files.map(async ({ local_path, installed_path }) => {
 		return copy_file_or_directory(local_path, installed_path);
 	}));

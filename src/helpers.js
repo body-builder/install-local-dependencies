@@ -99,8 +99,8 @@ async function remove_file_or_directory(file_path) {
 	return promisified.rimraf(file_path);
 }
 
-async function copy_file_or_directory(link_target, link_path) {
-	const stats = await get_file_stats(link_target);
+async function copy_file_or_directory(source_path, destination_path) {
+	const stats = await get_file_stats(source_path);
 
 	if (!stats) {
 		return;
@@ -109,12 +109,12 @@ async function copy_file_or_directory(link_target, link_path) {
 	const is_directory = stats.isDirectory();
 
 	if (is_directory) {
-		return promisified.fs.mkdir(link_path);
+		return promisified.fs.mkdir(destination_path);
 	}
 
-	// console.log('COPY', link_target, 'to', link_path);
+	// console.log('COPY', source_path, 'to', destination_path);
 
-	return promisified.fse.copy(link_target, link_path);
+	return promisified.fse.copy(source_path, destination_path);
 }
 
 /**
