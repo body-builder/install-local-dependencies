@@ -81,7 +81,7 @@ async function validate_path(path) {
  */
 async function get_file_stats(file_path) {
 	try {
-		return await promisified.fs.lstat(file_path);
+		return await promisified.fse.lstat(file_path);
 	} catch (e) {
 		return null;
 	}
