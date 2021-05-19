@@ -22,7 +22,7 @@
     "watch-local-dependencies": "./bin/watch.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "release": "standard-version --sign"
   },
   "author": "Benedek Káldi",
   "license": "ISC",
