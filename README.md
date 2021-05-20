@@ -5,7 +5,7 @@
 [![devDependencies Status](https://david-dm.org/body-builder/install-local-dependencies/dev-status.svg)](https://david-dm.org/body-builder/install-local-dependencies?type=dev)
 [![peerDependencies Status](https://david-dm.org/body-builder/install-local-dependencies/peer-status.svg)](https://david-dm.org/body-builder/install-local-dependencies?type=peer)
 
-Yet another local dependency installer. Works with NPM, Yarn and PNPM.
+Yet another local dependency installer (and watcher). Works with NPM, Yarn and PNPM.
 
 `install-local-dependencies` checks your **package.json** and installs the listed local packages as they were installed from `npm`. This helps you to get a production-like installation of your locally developed package, without all the issues of symlinked packages (`npm link`), invalid peerDependencies, or different dependency instances in the project, and the development package (eg. React's Invalid Hook Call warnings).
 
