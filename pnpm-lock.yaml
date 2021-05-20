@@ -1,25 +1,25 @@
 lockfileVersion: 5.3
 
 specifiers:
-  chokidar: ^3.5.0
+  chokidar: ^3.5.1
   cosmiconfig: ^7.0.0
-  exec-sh: ^0.3.4
+  exec-sh: ^0.4.0
   find-cache-dir: ^3.3.1
-  fs-extra: ^9.0.1
-  globby: ^11.0.2
-  lodash: ^4.17.20
+  fs-extra: ^10.0.0
+  globby: ^11.0.3
+  lodash: ^4.17.21
   pify: ^5.0.0
   rimraf: ^3.0.2
-  tar: ^6.0.5
+  tar: ^6.1.0
 
 dependencies:
-  chokidar: 3.5.0
+  chokidar: 3.5.1
   cosmiconfig: 7.0.0
-  exec-sh: 0.3.4
+  exec-sh: 0.4.0
   find-cache-dir: 3.3.1
-  fs-extra: 9.0.1
-  globby: 11.0.2
-  lodash: 4.17.20
+  fs-extra: 10.0.0
+  globby: 11.0.3
+  lodash: 4.17.21
   pify: 5.0.0
   rimraf: 3.0.2
   tar: 6.1.0
@@ -89,11 +89,6 @@ packages:
     engines: {node: '>=8'}
     dev: false
 
-  /at-least-node/1.0.0:
-    resolution: {integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==}
-    engines: {node: '>= 4.0.0'}
-    dev: false
-
   /balanced-match/1.0.0:
     resolution: {integrity: sha1-ibTRmasr7kneFk6gK4nORi1xt2c=}
     dev: false
@@ -131,8 +126,8 @@ packages:
       supports-color: 5.5.0
     dev: false
 
-  /chokidar/3.5.0:
-    resolution: {integrity: sha512-JgQM9JS92ZbFR4P90EvmzNpSGhpPBGBSj10PILeDyYFwp4h2/D9OM03wsJ4zW1fEp4ka2DGrnUeD7FuvQ2aZ2Q==}
+  /chokidar/3.5.1:
+    resolution: {integrity: sha512-9+s+Od+W0VJJzawDma/gvBNQqkTiqYTWLuZoyAsivsI4AaWTCzHG06/TMjsf1cYe9Cb97UCEhjz7HvnPk2p/tw==}
     engines: {node: '>= 8.10.0'}
     dependencies:
       anymatch: 3.1.1
@@ -198,8 +193,8 @@ packages:
     engines: {node: '>=0.8.0'}
     dev: false
 
-  /exec-sh/0.3.4:
-    resolution: {integrity: sha512-sEFIkc61v75sWeOe72qyrqg2Qg0OuLESziUDk/O/z2qgS15y2gWVFrI6f2Qn/qw/0/NCfCEsmNA4zOjkwEZT1A==}
+  /exec-sh/0.4.0:
+    resolution: {integrity: sha512-BgAFra+J+hK/wquyWchMiqgaxSv1ec2c+//DRSePlF3NLx/tBOmkIkJEc1hWrX4Yis3tzxgv1+FiFs/mmucs/g==}
     dev: false
 
   /fast-glob/3.2.4:
@@ -244,14 +239,13 @@ packages:
       path-exists: 4.0.0
     dev: false
 
-  /fs-extra/9.0.1:
-    resolution: {integrity: sha512-h2iAoN838FqAFJY2/qVpzFXy+EBxfVE220PalAqQLDVsFOHLJrZvut5puAbCdNv6WJk+B8ihI+k0c7JK5erwqQ==}
-    engines: {node: '>=10'}
+  /fs-extra/10.0.0:
+    resolution: {integrity: sha512-C5owb14u9eJwizKGdchcDUQeFtlSHHthBk8pbX9Vc1PFZrLombudjDnNns88aYslCyF6IY5SUw3Roz6xShcEIQ==}
+    engines: {node: '>=12'}
     dependencies:
-      at-least-node: 1.0.0
       graceful-fs: 4.2.4
       jsonfile: 6.1.0
-      universalify: 1.0.0
+      universalify: 2.0.0
     dev: false
 
   /fs-minipass/2.1.0:
@@ -290,8 +284,8 @@ packages:
       path-is-absolute: 1.0.1
     dev: false
 
-  /globby/11.0.2:
-    resolution: {integrity: sha512-2ZThXDvvV8fYFRVIxnrMQBipZQDr7MxKAmQK1vujaj9/7eF0efG7BPUKJ7jP7G5SLF37xKDXvO4S/KKLj/Z0og==}
+  /globby/11.0.3:
+    resolution: {integrity: sha512-ffdmosjA807y7+lA1NM0jELARVmYul/715xiILEjo3hBLPTcirgQNnXECn5g3mtR8TOLCVbkfua1Hpen25/Xcg==}
     engines: {node: '>=10'}
     dependencies:
       array-union: 2.1.0
@@ -390,8 +384,8 @@ packages:
       p-locate: 4.1.0
     dev: false
 
-  /lodash/4.17.20:
-    resolution: {integrity: sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==}
+  /lodash/4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
     dev: false
 
   /make-dir/3.1.0:
@@ -582,11 +576,6 @@ packages:
     engines: {node: '>=8.0'}
     dependencies:
       is-number: 7.0.0
-    dev: false
-
-  /universalify/1.0.0:
-    resolution: {integrity: sha512-rb6X1W158d7pRQBg5gkR8uPaSfiids68LTJQYOtEUhoJUWBdaQHsuT/EUduxXYxcrt4r5PJ4fuHW1MHT6p0qug==}
-    engines: {node: '>= 10.0.0'}
     dev: false
 
   /universalify/2.0.0:
