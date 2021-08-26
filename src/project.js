@@ -7,6 +7,7 @@ const { create_tarball } = require('./dependency');
 const {
 	remove_file_or_directory,
 	copy_file_or_directory,
+	definitely_posix,
 	detect_newline_at_eof,
 	sleep,
 	promisified,
@@ -155,8 +156,8 @@ async function collect_dependencies_files(packed_dependencies, { cwd, modules_pa
 
 	return Promise.all(packed_dependencies.map(async (dependency) => {
 		const { local_dependency_name, local_dependency_path, local_package_files } = dependency;
-		const local_package_path = path.resolve(cwd, local_dependency_path); // source
-		const installed_package_path = path.resolve(modules_path, local_dependency_name); // target
+		const local_package_path = definitely_posix(path.resolve(cwd, local_dependency_path)); // source
+		const installed_package_path = definitely_posix(path.resolve(modules_path, local_dependency_name)); // target
 
 		if (!await promisified.fs.exists(installed_package_path)) {
 			throw new Error(`Could not find the installed package '${local_dependency_name}' in '${installed_package_path}'`);
@@ -177,8 +178,8 @@ async function collect_dependencies_files_flat(globed_dependencies) {
 
 		// Link files
 		return await Promise.all(local_package_files.map(async (file) => {
-			const local_path = path.resolve(local_package_path, file); // The path to the source file
-			const installed_path = path.resolve(installed_package_path, file); // The path to the file in the installed package
+			const local_path = definitely_posix(path.resolve(local_package_path, file)); // The path to the source file
+			const installed_path = definitely_posix(path.resolve(installed_package_path, file)); // The path to the file in the installed package
 
 			return { local_path, installed_path };
 		}));
@@ -276,7 +277,8 @@ async function watch_dependencies(packed_dependencies, { cwd, modules_path, igno
 			await watch_idle_log();
 			isReady = true;
 		})
-		.on('add', async (source_path) => {
+		.on('add', async (unsafe_source_path) => {
+			const source_path = definitely_posix(unsafe_source_path);
 			const { target_path, package_name, filename } = get_target_path(source_path);
 			await copy_file_or_directory(source_path, target_path);
 			// Do not pollute the console with the bootstrapping data
@@ -285,13 +287,15 @@ async function watch_dependencies(packed_dependencies, { cwd, modules_path, igno
 				await watch_idle_log();
 			}
 		})
-		.on('change', async (source_path) => {
+		.on('change', async (unsafe_source_path) => {
+			const source_path = definitely_posix(unsafe_source_path);
 			const { target_path, package_name, filename } = get_target_path(source_path);
 			await copy_file_or_directory(source_path, target_path);
 			console.log(color_log(`${package_name}/${filename}`, console_colors.FgYellow), 'changed');
 			await watch_idle_log();
 		})
-		.on('unlink', async (source_path) => {
+		.on('unlink', async (unsafe_source_path) => {
+			const source_path = definitely_posix(unsafe_source_path);
 			const { target_path, package_name, filename } = get_target_path(source_path);
 			await remove_file_or_directory(target_path);
 			console.log(color_log(`${package_name}/${filename}`, console_colors.FgRed), 'deleted');

@@ -1,3 +1,4 @@
+const path = require('path');
 const fs = require('fs');
 const fse = require('fs-extra');
 const pify = require('pify');
@@ -138,6 +139,15 @@ function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * Converts your path `p` to POSIX format irrespective of whether you're already on POSIX platforms, or on win32
+ * @param p path string
+ * @see https://stackoverflow.com/a/63251716/3111787
+ */
+function definitely_posix(p) {
+	return p.split(path.sep).join(path.posix.sep);
+}
+
 module.exports = {
 	validate_path,
 	get_file_stats,
@@ -145,6 +155,7 @@ module.exports = {
 	copy_file_or_directory,
 	detect_newline_at_eof,
 	sleep,
+	definitely_posix,
 	promisified,
 	console_colors,
 	color_log,
