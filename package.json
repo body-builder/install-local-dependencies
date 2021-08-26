@@ -37,5 +37,8 @@
     "pify": "^5.0.0",
     "rimraf": "^3.0.2",
     "tar": "^6.1.0"
+  },
+  "devDependencies": {
+    "standard-version": "^9.3.1"
   }
 }
