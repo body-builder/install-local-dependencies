@@ -1,9 +1,9 @@
 const path = require('path');
-const globby = require('globby');
+const packlist = require('npm-packlist');
 const tar = require('tar');
 const execSh = require('exec-sh').promise;
 
-const { validate_path, promisified } = require('./helpers')
+const { validate_path, promisified, default_ignore_rules } = require('./helpers')
 
 /**
  *
@@ -27,6 +27,53 @@ async function get_package_details(relative_package_path) {
 		package_json_path,
 		package_json_content,
 	};
+}
+
+/**
+ * Returns the Array of the ignore-rules based on the root `.npmignore` file, or if that doesn't exist, based on the root `.gitignore` file
+ * @param relative_package_path
+ * @returns {Promise<*[]|*>}
+ */
+async function get_ignore_file_rules(relative_package_path) {
+	const npmignorePath = path.resolve(relative_package_path, '.npmignore');
+	const gitignorePath = path.resolve(relative_package_path, '.gitignore');
+
+	let ignorefile;
+
+	try {
+		// try to read .npmignore
+		ignorefile = await promisified.fs.readFile(npmignorePath, 'utf-8');
+	} catch (e) {
+		// .npmignore not found, try to read .gitignore
+		try {
+			ignorefile = await promisified.fs.readFile(gitignorePath, 'utf-8');
+		} catch (e) {
+			// No ignore file found
+			return [];
+		}
+	}
+
+	return ignorefile
+		.split('\n')
+		.filter(Boolean) // Empty lines
+		.filter((line) => !line.trim().startsWith('#')); // Comments
+}
+
+/**
+ * Returns the list of the
+ * @param relative_package_path
+ * @returns {Promise<*[]>}
+ */
+async function get_ignore_rules(relative_package_path) {
+	const local_ignore_rules = await get_ignore_file_rules(relative_package_path);
+
+	const all_rules = [
+		'node_modules', // We don't manage `bundledDependencies` in watch mode!
+		...default_ignore_rules,
+		...local_ignore_rules,
+	];
+
+	return all_rules.map((pattern) => path.join(relative_package_path, pattern));
 }
 
 /**
@@ -62,7 +109,6 @@ async function create_tarball({ name: local_dependency_name, version: local_depe
 	// console.log('create_tarball', local_dependency_path);
 	const {
 		package_path,
-		package_json_filename,
 		package_json_content,
 	} = await get_package_details(local_dependency_path);
 
@@ -71,13 +117,7 @@ async function create_tarball({ name: local_dependency_name, version: local_depe
 	const tarball_name = `${filename_from_package_name(package_name, package_version)}.tgz`;
 	const tarball_path = path.resolve(temp_path, tarball_name);
 
-	const local_package_files = await globby('**/*', {
-		cwd: package_path,
-		dot: true,
-		onlyFiles: false,
-		markDirectories: true,
-		ignore: ignored_files,
-	});
+	const local_package_files = await packlist({ path: package_path });
 
 	try {
 		await validate_path(temp_path);
@@ -87,7 +127,7 @@ async function create_tarball({ name: local_dependency_name, version: local_depe
 				file: tarball_path,
 				gzip: true,
 			},
-			[package_json_filename, ...local_package_files],
+			local_package_files,
 		);
 	} catch (e) {
 		console.log(e);
@@ -144,6 +184,8 @@ async function delete_tarball(tarball_name, { temp_path }) {
 }
 
 module.exports = {
+	get_ignore_file_rules,
+	get_ignore_rules,
 	create_tarball,
 	install_tarball,
 	delete_tarball,

@@ -3,7 +3,7 @@ const chokidar = require('chokidar');
 const execSh = require('exec-sh').promise;
 const _ = require('lodash');
 
-const { create_tarball } = require('./dependency');
+const { create_tarball, get_ignore_rules } = require('./dependency');
 const {
 	remove_file_or_directory,
 	copy_file_or_directory,
@@ -227,10 +227,10 @@ async function watch_dependencies(packed_dependencies, { cwd, modules_path, igno
 	});
 
 	const files_to_watch = globed_dependencies.map(({ local_package_path }) => `${local_package_path}/.`);
-	const ignore_glob = `{${ignored_files.map((rule) => `**/${rule}`).join(',')}}`;
+	const ignore_glob = await Promise.all(globed_dependencies.map(({ local_package_path }) => get_ignore_rules(local_package_path)));
 
 	const watcher = chokidar.watch(files_to_watch, {
-		ignored: ignore_glob,
+		ignored: `{${ignore_glob.join(',')}}`,
 	});
 
 	/**

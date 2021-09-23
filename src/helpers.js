@@ -13,6 +13,34 @@ const promisified = {
 	rimraf: pify(rimraf),
 };
 
+// https://github.com/npm/npm-packlist/blob/main/index.js#L37
+const default_ignore_rules = [
+	'.npmignore',
+	'.gitignore',
+	'**/.git',
+	'**/.svn',
+	'**/.hg',
+	'**/CVS',
+	'**/.git/**',
+	'**/.svn/**',
+	'**/.hg/**',
+	'**/CVS/**',
+	'/.lock-wscript',
+	'/.wafpickle-*',
+	'/build/config.gypi',
+	'npm-debug.log',
+	'**/.npmrc',
+	'.*.swp',
+	'.DS_Store',
+	'**/.DS_Store/**',
+	'._*',
+	'**/._*/**',
+	'*.orig',
+	'/package-lock.json',
+	'/yarn.lock',
+	'/archived-packages/**',
+];
+
 // https://stackoverflow.com/a/41407246/3111787
 // https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
 const console_colors = {
@@ -156,6 +184,7 @@ module.exports = {
 	detect_newline_at_eof,
 	sleep,
 	definitely_posix,
+	default_ignore_rules,
 	promisified,
 	console_colors,
 	color_log,
