@@ -1,6 +1,6 @@
 {
   "name": "install-local-dependencies",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Yet another local dependency installer",
   "homepage": "https://github.com/body-builder/install-local-dependencies#readme",
   "repository": "https://github.com/body-builder/install-local-dependencies",
