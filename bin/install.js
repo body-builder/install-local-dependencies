@@ -15,7 +15,6 @@ async function install() {
 		manager,
 		install_args,
 		types,
-		ignored_files,
 		ignored_packages,
 	} = await getConfig();
 
@@ -23,7 +22,6 @@ async function install() {
 		types,
 		cwd,
 		temp_path,
-		ignored_files,
 		ignored_packages,
 	});
 

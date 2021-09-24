@@ -18,7 +18,6 @@ async function config() {
 		manager: 'npm',
 		install_args: '',
 		types: ['dependencies', 'devDependencies'],
-		ignored_files: ['package.json', 'node_modules', '.DS_Store'],
 		ignored_packages: [],
 	};
 

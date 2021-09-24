@@ -3,7 +3,7 @@ const chokidar = require('chokidar');
 const execSh = require('exec-sh').promise;
 const _ = require('lodash');
 
-const { create_tarball } = require('./dependency');
+const { create_tarball, get_ignore_rules } = require('./dependency');
 const {
 	remove_file_or_directory,
 	copy_file_or_directory,
@@ -103,10 +103,9 @@ function get_local_dependencies(package_json_content, { types, ignored_packages 
 /**
  * @param local_dependencies {object}
  * @param temp_path {string}
- * @param ignored_files {string[]}
  * @returns {Promise<{mocked_dependencies, created_tarballs: []}>}
  */
-async function get_mocked_dependencies(local_dependencies, { temp_path, ignored_files }) {
+async function get_mocked_dependencies(local_dependencies, { temp_path }) {
 	const mocked_dependencies = _.cloneDeep(local_dependencies);
 	const packed_dependencies = [];
 
@@ -115,7 +114,7 @@ async function get_mocked_dependencies(local_dependencies, { temp_path, ignored_
 		const type_object = local_dependencies[type];
 
 		return await Promise.all(Object.entries(type_object).map(async ([name, version]) => {
-			const tarball = await create_tarball({ name, version }, { temp_path, ignored_files });
+			const tarball = await create_tarball({ name, version }, { temp_path });
 
 			mocked_dependencies[type][name] = tarball.tarball_path;
 
@@ -128,7 +127,7 @@ async function get_mocked_dependencies(local_dependencies, { temp_path, ignored_
 	return { mocked_dependencies, packed_dependencies };
 }
 
-async function prepare_dependencies({ types, cwd, temp_path, ignored_files, ignored_packages }) {
+async function prepare_dependencies({ types, cwd, temp_path, ignored_packages }) {
 	// Save original package.json content
 	const original_package_json = get_package_json({ cwd });
 
@@ -137,14 +136,13 @@ async function prepare_dependencies({ types, cwd, temp_path, ignored_files, igno
 	// Create the tarballs, and get the mocked dependency paths
 	const { mocked_dependencies, packed_dependencies } = await get_mocked_dependencies(local_dependencies, {
 		temp_path,
-		ignored_files,
 	});
 
 	// This contains all the required data to install the dependencies, or start the watcher
 	return { original_package_json, local_dependencies, mocked_dependencies, packed_dependencies };
 }
 
-async function collect_dependencies_files(packed_dependencies, { cwd, modules_path, ignored_files }) {
+async function collect_dependencies_files(packed_dependencies, { cwd, modules_path }) {
 	// console.log('collect_dependencies_files');
 	if (!Array.isArray(packed_dependencies)) {
 		throw new Error('No data received to install the dependencies.');
@@ -193,15 +191,13 @@ async function collect_dependencies_files_flat(globed_dependencies) {
  * @param packed_dependencies {array}
  * @param cwd {string}
  * @param modules_path {string}
- * @param ignored_files {string}
  * @returns {Promise<void>}
  */
-async function copy_dependencies(packed_dependencies, { cwd, modules_path, ignored_files }) {
+async function copy_dependencies(packed_dependencies, { cwd, modules_path }) {
 	// console.log('copy_dependencies');
 	const globed_dependencies = await collect_dependencies_files(packed_dependencies, {
 		cwd,
 		modules_path,
-		ignored_files,
 	});
 
 	const all_dependencies_files = await collect_dependencies_files_flat(globed_dependencies);
@@ -218,19 +214,18 @@ async function copy_dependencies(packed_dependencies, { cwd, modules_path, ignor
 	}));
 }
 
-async function watch_dependencies(packed_dependencies, { cwd, modules_path, ignored_files }) {
+async function watch_dependencies(packed_dependencies, { cwd, modules_path }) {
 	// console.log('watch_dependencies');
 	const globed_dependencies = await collect_dependencies_files(packed_dependencies, {
 		cwd,
 		modules_path,
-		ignored_files,
 	});
 
 	const files_to_watch = globed_dependencies.map(({ local_package_path }) => `${local_package_path}/.`);
-	const ignore_glob = `{${ignored_files.map((rule) => `**/${rule}`).join(',')}}`;
+	const ignore_glob = await Promise.all(globed_dependencies.map(({ local_package_path }) => get_ignore_rules(local_package_path)));
 
 	const watcher = chokidar.watch(files_to_watch, {
-		ignored: ignore_glob,
+		ignored: `{${ignore_glob.join(',')}}`,
 	});
 
 	/**
