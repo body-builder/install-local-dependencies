@@ -50,7 +50,6 @@ package.json
   "modules_dir": "node_modules", 
   "install_args": "", // extra arguments for the internal npm/yarn/pnpm install command (example: "--legacy-peer-deps")
   "types": ["dependencies"], // dependency types you want to handle with `install-local-dependencies` (these packages will also get installed, but in the regular way) (defaults to ["dependencies", "devDependencies"])
-  "ignored_files": ["**/an_ignored_file.ext"], // files not to include to the installed package (defaults to ["package.json", "node_modules"])
   "ignored_packages": [], // list of local packages you don't want to handle with `install-local-dependencies` (these packages will also get installed, but in the regular way)
 }
 ```

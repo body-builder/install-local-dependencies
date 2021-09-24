@@ -5,13 +5,12 @@ const { prepare_dependencies, watch_dependencies } = require('../src/project');
 const { delete_tarball } = require('../src/dependency');
 
 async function watch() {
-	const { cwd, temp_path, modules_path, manager, types, ignored_files, ignored_packages } = await getConfig();
+	const { cwd, temp_path, modules_path, manager, types, ignored_packages } = await getConfig();
 
 	const { mocked_dependencies, packed_dependencies } = await prepare_dependencies({
 		types,
 		cwd,
 		temp_path,
-		ignored_files,
 		ignored_packages,
 	});
 
@@ -23,7 +22,7 @@ async function watch() {
 		return null;
 	}
 
-	await watch_dependencies(packed_dependencies, { cwd, modules_path, ignored_files });
+	await watch_dependencies(packed_dependencies, { cwd, modules_path });
 
 	return packed_dependencies;
 }

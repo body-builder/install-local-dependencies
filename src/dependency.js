@@ -102,10 +102,9 @@ function filename_from_package_name(name, version) {
  * @param local_dependency_name
  * @param local_dependency_path
  * @param temp_path
- * @param ignored_files
  * @returns {Promise<string>}
  */
-async function create_tarball({ name: local_dependency_name, version: local_dependency_path }, { temp_path, ignored_files }) {
+async function create_tarball({ name: local_dependency_name, version: local_dependency_path }, { temp_path }) {
 	// console.log('create_tarball', local_dependency_path);
 	const {
 		package_path,
