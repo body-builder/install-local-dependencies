@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/body-builder/install-local-dependencies/compare/v0.2.0...v0.2.1) (2021-10-21)
+
+
+### Bug Fixes
+
+* Issues with ignored files in watch mode on MacOS ([d55998d](https://github.com/body-builder/install-local-dependencies/commit/d55998d13c3b3b4ea10afd4d74a3dab217b7f4fd))
+
 ## [0.2.0](https://github.com/body-builder/install-local-dependencies/compare/v0.1.1...v0.2.0) (2021-09-24)
 
 
