@@ -222,10 +222,13 @@ async function watch_dependencies(packed_dependencies, { cwd, modules_path }) {
 	});
 
 	const files_to_watch = globed_dependencies.map(({ local_package_path }) => `${local_package_path}/.`);
-	const ignore_glob = await Promise.all(globed_dependencies.map(({ local_package_path }) => get_ignore_rules(local_package_path)));
+	const ignored_paths = (await Promise.all(globed_dependencies.map(({ local_package_path }) => get_ignore_rules(local_package_path)))).flat();
 
 	const watcher = chokidar.watch(files_to_watch, {
-		ignored: `{${ignore_glob.join(',')}}`,
+		// We compare the paths manually, because glob-patterns were not working on MacOS with folder-specific ignore rules (eg. `/tests`),
+		// only if we explicitly set the rule to `/tests/**/*`. We could check each rule, whether it is a folder, and add `/**/*` respectively,
+		// but that seems to be even more expensive. (Probably related to: https://github.com/paulmillr/chokidar/issues/773)
+		ignored: (file_path) => ignored_paths.some((ignored_path) => file_path.startsWith(ignored_path)),
 	});
 
 	/**
