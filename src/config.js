@@ -3,6 +3,11 @@ const { cosmiconfig } = require('cosmiconfig');
 const find_cache_dir = require('find-cache-dir');
 const this_package_json = require('../package.json');
 
+process.on('unhandledRejection', e => {
+	console.error(e);
+	process.exit(1);
+});
+
 async function config() {
 	const cwd = process.cwd(); // TODO possiblity for process.args
 

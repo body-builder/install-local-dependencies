@@ -19,7 +19,8 @@
   ],
   "bin": {
     "install-local-dependencies": "./bin/install.js",
-    "watch-local-dependencies": "./bin/watch.js"
+    "watch-local-dependencies": "./bin/watch.js",
+    "ldm": "./bin/ldm.js"
   },
   "scripts": {
     "release": "standard-version --sign"

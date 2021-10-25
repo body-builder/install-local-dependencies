@@ -55,9 +55,36 @@ function get_local_package_path(version) {
 }
 
 /**
+ * Runs the `$ (npm|yarn|pnpm)` command with the given arguments in the project
+ * @param cwd
+ * @param manager
+ * @param command
+ * @param args
+ * @returns {Promise<void>}
+ */
+async function run_script({ cwd, manager, command, args }) {
+	// console.log('run_script');
+	const args_string = args.join(' ');
+
+	const allowed_commands = ['install', 'remove', 'add'];
+
+	if (!allowed_commands.includes(command)) {
+		throw new Error(`Command '${command}' not allowed. Allowed commands: '${allowed_commands.join("', '")}'`);
+	}
+
+	try {
+		await execSh(`${manager} ${command} ${args_string}`, { cwd });
+	} catch (e) {
+		console.log(`Could not run command '${manager} ${command} ${args_string}'`);
+		throw e;
+	}
+}
+
+/**
  * Starts an `$ (npm|yarn|pnpm) install` action in the project
  * @param cwd
  * @param manager
+ * @param install_args
  * @returns {Promise<void>}
  */
 async function install_project({ cwd, manager, install_args }) {
@@ -314,6 +341,7 @@ async function watch_dependencies(packed_dependencies, { cwd, modules_path }) {
 module.exports = {
 	get_package_json,
 	save_package_json,
+	run_script,
 	install_project,
 	get_local_dependencies,
 	get_mocked_dependencies,
