@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.2](https://github.com/body-builder/install-local-dependencies/compare/v0.2.1...v0.2.2) (2021-10-25)
+
+
+### Bug Fixes
+
+* Windows backslash-issue in `get_ignore_rules()` ([efb7571](https://github.com/body-builder/install-local-dependencies/commit/efb75710f4e721c35587d2bb55d919a5908ccf00))
+
 ### [0.2.1](https://github.com/body-builder/install-local-dependencies/compare/v0.2.0...v0.2.1) (2021-10-21)
 
 
