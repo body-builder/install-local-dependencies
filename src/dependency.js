@@ -3,7 +3,7 @@ const packlist = require('npm-packlist');
 const tar = require('tar');
 const execSh = require('exec-sh').promise;
 
-const { validate_path, promisified, default_ignore_rules } = require('./helpers')
+const { validate_path, promisified, default_ignore_rules, definitely_posix } = require('./helpers')
 
 /**
  *
@@ -73,7 +73,7 @@ async function get_ignore_rules(relative_package_path) {
 		...local_ignore_rules,
 	];
 
-	return all_rules.map((pattern) => path.join(relative_package_path, pattern));
+	return all_rules.map((pattern) => definitely_posix(path.join(relative_package_path, pattern)));
 }
 
 /**
