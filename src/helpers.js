@@ -143,7 +143,7 @@ async function copy_file_or_directory(source_path, destination_path) {
 
 	// console.log('COPY', source_path, 'to', destination_path);
 
-	return promisified.fse.copy(source_path, destination_path);
+	return fs.promises.copyFile(source_path, destination_path);
 }
 
 /**
