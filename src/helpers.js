@@ -1,15 +1,9 @@
 const path = require('path');
 const fs = require('fs');
-const fse = require('fs-extra');
 const pify = require('pify');
 const rimraf = require('rimraf');
 
 const promisified = {
-	fs: {
-		...pify(fs),
-		exists: pify(fs.exists, { errorFirst: false }),
-	},
-	fse: pify(fse),
 	rimraf: pify(rimraf),
 };
 
@@ -98,8 +92,8 @@ function color_log(msg, color) {
  * @param path {string}
  */
 async function validate_path(path) {
-	if (!await promisified.fs.exists(path)) {
-		await promisified.fs.mkdir(path, { recursive: true });
+	if (!fs.existsSync(path)) {
+		await fs.promises.mkdir(path, { recursive: true });
 	}
 }
 
@@ -110,7 +104,7 @@ async function validate_path(path) {
  */
 async function get_file_stats(file_path) {
 	try {
-		return await promisified.fse.lstat(file_path);
+		return await fs.promises.lstat(file_path);
 	} catch (e) {
 		return null;
 	}
@@ -138,12 +132,12 @@ async function copy_file_or_directory(source_path, destination_path) {
 	const is_directory = stats.isDirectory();
 
 	if (is_directory) {
-		return promisified.fs.mkdir(destination_path);
+		return fs.promises.mkdir(destination_path);
 	}
 
 	// console.log('COPY', source_path, 'to', destination_path);
 
-	return promisified.fse.copy(source_path, destination_path);
+	return fs.promises.copyFile(source_path, destination_path);
 }
 
 /**
@@ -152,7 +146,7 @@ async function copy_file_or_directory(source_path, destination_path) {
  * @returns {Promise<null|*>}
  */
 async function detect_newline_at_eof(path) {
-	const fileContents = await promisified.fs.readFile(path, 'utf-8');
+	const fileContents = await fs.promises.readFile(path, 'utf-8');
 
 	const matches = fileContents.match(/\r?\n$/);
 
