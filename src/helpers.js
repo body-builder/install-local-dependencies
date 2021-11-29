@@ -1,6 +1,5 @@
 const path = require('path');
 const fs = require('fs');
-const fse = require('fs-extra');
 const pify = require('pify');
 const rimraf = require('rimraf');
 
@@ -9,7 +8,6 @@ const promisified = {
 		...pify(fs),
 		exists: pify(fs.exists, { errorFirst: false }),
 	},
-	fse: pify(fse),
 	rimraf: pify(rimraf),
 };
 
@@ -110,7 +108,7 @@ async function validate_path(path) {
  */
 async function get_file_stats(file_path) {
 	try {
-		return await promisified.fse.lstat(file_path);
+		return await fs.promises.lstat(file_path);
 	} catch (e) {
 		return null;
 	}
