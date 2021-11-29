@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const packlist = require('npm-packlist');
 const tar = require('tar');
@@ -8,12 +9,12 @@ const { validate_path, promisified, default_ignore_rules, definitely_posix } = r
 /**
  *
  * @param relative_package_path {string}
- * @returns {Promise<{package_json_path: string, package_path: string, package_json_filename: string, package_json_content: *}>}
+ * @returns {{package_json_path: string, package_path: string, package_json_filename: string, package_json_content: *}}
  */
-async function get_package_details(relative_package_path) {
+function get_package_details(relative_package_path) {
 	const package_path = path.resolve(relative_package_path);
 
-	if (!await promisified.fs.exists(package_path)) {
+	if (!fs.existsSync(package_path)) {
 		throw new Error(`Module '${relative_package_path}' was not found in '${path.resolve()}'.`);
 	}
 
@@ -42,11 +43,11 @@ async function get_ignore_file_rules(relative_package_path) {
 
 	try {
 		// try to read .npmignore
-		ignorefile = await promisified.fs.readFile(npmignorePath, 'utf-8');
+		ignorefile = await fs.promises.readFile(npmignorePath, 'utf-8');
 	} catch (e) {
 		// .npmignore not found, try to read .gitignore
 		try {
-			ignorefile = await promisified.fs.readFile(gitignorePath, 'utf-8');
+			ignorefile = await fs.promises.readFile(gitignorePath, 'utf-8');
 		} catch (e) {
 			// No ignore file found
 			return [];
@@ -133,7 +134,7 @@ async function create_tarball({ name: local_dependency_name, version: local_depe
 		throw new Error(`Could not pack module '${local_dependency_path}'`);
 	}
 
-	if (!await promisified.fs.exists(tarball_path)) {
+	if (!fs.existsSync(tarball_path)) {
 		throw new Error(`Could not locate the created tarball '${tarball_name}' in '${temp_path}'.`);
 	}
 
@@ -179,7 +180,7 @@ async function install_tarball(tarball_name, { temp_path, cwd, manager = 'pnpm' 
 async function delete_tarball(tarball_name, { temp_path }) {
 	// console.log('delete_tarball', tarball_name);
 	const tarball_path = path.resolve(temp_path, tarball_name);
-	await promisified.fs.unlink(tarball_path);
+	await fs.promises.unlink(tarball_path);
 }
 
 module.exports = {

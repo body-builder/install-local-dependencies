@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const chokidar = require('chokidar');
 const execSh = require('exec-sh').promise;
@@ -37,7 +38,7 @@ async function save_package_json(content, { cwd }) {
 
 	const newline_char = await detect_newline_at_eof(package_json_path);
 
-	promisified.fs.writeFile(package_json_path, JSON.stringify(content, null, 2) + newline_char);
+	await fs.promises.writeFile(package_json_path, JSON.stringify(content, null, 2) + newline_char);
 }
 
 /**
@@ -148,7 +149,7 @@ async function collect_dependencies_files(packed_dependencies, { cwd, modules_pa
 		throw new Error('No data received to install the dependencies.');
 	}
 
-	if (!await promisified.fs.exists(modules_path)) {
+	if (!fs.existsSync(modules_path)) {
 		throw new Error(`Could not find the modules directory. Tried: '${modules_path}'`);
 	}
 
@@ -157,7 +158,7 @@ async function collect_dependencies_files(packed_dependencies, { cwd, modules_pa
 		const local_package_path = definitely_posix(path.resolve(cwd, local_dependency_path)); // source
 		const installed_package_path = definitely_posix(path.resolve(modules_path, local_dependency_name)); // target
 
-		if (!await promisified.fs.exists(installed_package_path)) {
+		if (!fs.existsSync(installed_package_path)) {
 			throw new Error(`Could not find the installed package '${local_dependency_name}' in '${installed_package_path}'`);
 		}
 
