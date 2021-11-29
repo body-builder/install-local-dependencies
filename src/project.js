@@ -244,8 +244,8 @@ async function watch_dependencies(packed_dependencies, { cwd, modules_path }) {
 			throw new Error(`Could not find the package to which the file belongs to: '${source_path}'`);
 		}
 
-		const filename = path.relative(parent_dependency.local_package_path, source_path);
-		const target_path = path.resolve(parent_dependency.installed_package_path, filename);
+		const filename = definitely_posix(path.relative(parent_dependency.local_package_path, source_path));
+		const target_path = definitely_posix(path.resolve(parent_dependency.installed_package_path, filename));
 
 		return {
 			package_name: parent_dependency.local_dependency_name,
