@@ -59,6 +59,7 @@ function get_local_package_path(version) {
  * Starts an `$ (npm|yarn|pnpm) install` action in the project
  * @param cwd
  * @param manager
+ * @param install_args
  * @returns {Promise<void>}
  */
 async function install_project({ cwd, manager, install_args }) {
