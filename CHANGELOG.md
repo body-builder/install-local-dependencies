@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.3](https://github.com/body-builder/install-local-dependencies/compare/v0.2.1...v0.2.3) (2021-11-30)
+
+
+### Bug Fixes
+
+* Random ENOENT errors in `copy_file_or_directory` on Windows ([e8674fa](https://github.com/body-builder/install-local-dependencies/commit/e8674fa13f3b23c83922c7cee05f56ed07300790))
+* Use POSIX path separator also in `get_target_path` ([8ef6120](https://github.com/body-builder/install-local-dependencies/commit/8ef6120e280a8a3fb3b2469ebc680bc0c25e0cc2))
+* **watch-local-dependencies:** Wait with `add`/`change` events until the entire file gets written ([906c6c6](https://github.com/body-builder/install-local-dependencies/commit/906c6c6443658d5bfe54c52a0b87e462b154a893))
+* Windows backslash-issue in `get_ignore_rules()` ([efb7571](https://github.com/body-builder/install-local-dependencies/commit/efb75710f4e721c35587d2bb55d919a5908ccf00))
+
 ### [0.2.2](https://github.com/body-builder/install-local-dependencies/compare/v0.2.1...v0.2.2) (2021-10-25)
 
 
