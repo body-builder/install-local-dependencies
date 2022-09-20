@@ -154,7 +154,7 @@ async function detect_newline_at_eof(path) {
 		return matches[0];
 	}
 
-	return null;
+	return '';
 }
 
 function sleep(ms) {
