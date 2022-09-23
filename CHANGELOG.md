@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.4](https://github.com/body-builder/install-local-dependencies/compare/v0.2.3...v0.2.4) (2022-09-23)
+
+
+### Bug Fixes
+
+* package.json getting postended with "null" ([bfd4b21](https://github.com/body-builder/install-local-dependencies/commit/bfd4b21d3d57ed01cc4efe1cb434bd7390c60428))
+
 ### [0.2.3](https://github.com/body-builder/install-local-dependencies/compare/v0.2.1...v0.2.3) (2021-11-30)
 
 
