@@ -11,7 +11,6 @@ async function install() {
 	const {
 		cwd,
 		temp_path,
-		modules_path,
 		manager,
 		install_args,
 		types,
@@ -50,9 +49,12 @@ install()
 	.then((packed_dependencies) => {
 		if (packed_dependencies) {
 			console.log('Local dependencies installed');
-			console.log(packed_dependencies.map(({ package_name, package_version }) => `${color_log('+', console_colors.FgGreen)} ${package_name} ${color_log(`(${package_version})`, console_colors.FgBrightBlack)}`).join('\n'))
+			console.log(packed_dependencies.map(({
+				package_name,
+				package_version,
+			}) => `${color_log('+', console_colors.FgGreen)} ${package_name} ${color_log(`(${package_version})`, console_colors.FgBrightBlack)}`).join('\n'));
 		} else {
-			console.log('No local dependencies found to install')
+			console.log('No local dependencies found to install');
 		}
 	})
 	.catch((e) => {
