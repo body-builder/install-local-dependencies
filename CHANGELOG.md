@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.5](https://github.com/body-builder/install-local-dependencies/compare/v0.2.4...v0.2.5) (2022-11-30)
+
+
+### Bug Fixes
+
+* Do not interrupt the install task if the package.json doesn't have any local dependencies ([0b611d8](https://github.com/body-builder/install-local-dependencies/commit/0b611d80735630388f3823c68b812a87db9d0a32))
+* Do not restore the `package.json` before the installation task finishes ([98fa890](https://github.com/body-builder/install-local-dependencies/commit/98fa8901619c0e7ff3b9002878498b8d3083e4c8))
+
 ### [0.2.4](https://github.com/body-builder/install-local-dependencies/compare/v0.2.3...v0.2.4) (2022-09-23)
 
 
