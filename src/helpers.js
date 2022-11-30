@@ -81,7 +81,7 @@ const console_colors = {
 	BgBrightMagenta: '\x1b[105m',
 	BgBrightCyan: '\x1b[106m',
 	BgBrightWhite: '\x1b[107m',
-}
+};
 
 function color_log(msg, color) {
 	return `${color}${msg}${console_colors.Reset}`;

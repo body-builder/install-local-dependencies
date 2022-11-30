@@ -4,7 +4,7 @@ const packlist = require('npm-packlist');
 const tar = require('tar');
 const execSh = require('exec-sh').promise;
 
-const { validate_path, promisified, default_ignore_rules, definitely_posix } = require('./helpers')
+const { validate_path, default_ignore_rules, definitely_posix } = require('./helpers');
 
 /**
  *

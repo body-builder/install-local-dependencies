@@ -11,7 +11,6 @@ async function install() {
 	const {
 		cwd,
 		temp_path,
-		modules_path,
 		manager,
 		install_args,
 		types,
@@ -28,17 +27,23 @@ async function install() {
 	// Mock package.json
 	await save_package_json(_.merge({}, original_package_json, mocked_dependencies), { cwd });
 
-	if (!Object.keys(mocked_dependencies).length) {
-		// No local dependencies listed in package.json, exit
-		return null;
-	}
+	process.on('SIGINT', async (event, code) => {
+		await save_package_json(original_package_json, { cwd });
+		process.exit(code);
+	});
 
-	// Restore package.json (we do not want to wait for the end of the install script, to minimize the chance for the mocked
-	// content to remain in the package.json file, if something goes wrong, or the client terminates the install process)
-	setTimeout(() => save_package_json(original_package_json, { cwd }), 1000);
+	process.on('SIGTERM', async (event, code) => {
+		await save_package_json(original_package_json, { cwd });
+		process.exit(code);
+	});
 
 	// Install
-	await install_project({ cwd, manager, install_args });
+	try {
+		await install_project({ cwd, manager, install_args });
+	} finally {
+		// Restore package.json
+		await save_package_json(original_package_json, { cwd });
+	}
 
 	// Delete tarballs
 	await Promise.all(packed_dependencies.map(({ tarball_name }) => delete_tarball(tarball_name, { temp_path })));
@@ -48,11 +53,14 @@ async function install() {
 
 install()
 	.then((packed_dependencies) => {
-		if (packed_dependencies) {
+		if (packed_dependencies.length) {
 			console.log('Local dependencies installed');
-			console.log(packed_dependencies.map(({ package_name, package_version }) => `${color_log('+', console_colors.FgGreen)} ${package_name} ${color_log(`(${package_version})`, console_colors.FgBrightBlack)}`).join('\n'))
+			console.log(packed_dependencies.map(({
+				package_name,
+				package_version,
+			}) => `${color_log('+', console_colors.FgGreen)} ${package_name} ${color_log(`(${package_version})`, console_colors.FgBrightBlack)}`).join('\n'));
 		} else {
-			console.log('No local dependencies found to install')
+			console.log('No local dependencies found to install');
 		}
 	})
 	.catch((e) => {

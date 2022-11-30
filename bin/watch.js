@@ -5,7 +5,7 @@ const { prepare_dependencies, watch_dependencies } = require('../src/project');
 const { delete_tarball } = require('../src/dependency');
 
 async function watch() {
-	const { cwd, temp_path, modules_path, manager, types, ignored_packages } = await getConfig();
+	const { cwd, temp_path, modules_path, types, ignored_packages } = await getConfig();
 
 	const { mocked_dependencies, packed_dependencies } = await prepare_dependencies({
 		types,
@@ -32,7 +32,7 @@ watch()
 		if (packed_dependencies) {
 			console.log('Starting the local dependency watcher...');
 		} else {
-			console.log('No local dependencies found to watch')
+			console.log('No local dependencies found to watch');
 		}
 	})
 	.catch((e) => {

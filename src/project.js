@@ -11,7 +11,6 @@ const {
 	definitely_posix,
 	detect_newline_at_eof,
 	sleep,
-	promisified,
 	color_log,
 	console_colors,
 } = require('./helpers');
@@ -67,7 +66,7 @@ async function install_project({ cwd, manager, install_args }) {
 	try {
 		await execSh(`${manager} install ${install_args}`, { cwd });
 	} catch (e) {
-		console.log(e);
+		// console.log(e);
 		throw new Error(`Could not run '${manager} install' script in ${cwd}`);
 	}
 }
@@ -206,7 +205,7 @@ async function copy_dependencies(packed_dependencies, { cwd, modules_path }) {
 
 	// Delete files
 	// we should do this in two steps, to avoid possible deletion of already copied files (when a folder gets )
-	await Promise.all(all_dependencies_files.map(async ({ local_path, installed_path }) => {
+	await Promise.all(all_dependencies_files.map(async ({ installed_path }) => {
 		return remove_file_or_directory(installed_path);
 	}));
 
@@ -265,7 +264,7 @@ async function watch_dependencies(packed_dependencies, { cwd, modules_path }) {
 			console.clear();
 		}
 		console.log(msg);
-		console.log(color_log(globed_dependencies.map(({ local_dependency_name }) => `${local_dependency_name}`).join('\n'), console_colors.FgBrightBlack))
+		console.log(color_log(globed_dependencies.map(({ local_dependency_name }) => `${local_dependency_name}`).join('\n'), console_colors.FgBrightBlack));
 	}
 
 	let isReady = false;
