@@ -66,7 +66,7 @@ async function install_project({ cwd, manager, install_args }) {
 	try {
 		await execSh(`${manager} install ${install_args}`, { cwd });
 	} catch (e) {
-		console.log(e);
+		// console.log(e);
 		throw new Error(`Could not run '${manager} install' script in ${cwd}`);
 	}
 }
