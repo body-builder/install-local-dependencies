@@ -27,11 +27,6 @@ async function install() {
 	// Mock package.json
 	await save_package_json(_.merge({}, original_package_json, mocked_dependencies), { cwd });
 
-	if (!Object.keys(mocked_dependencies).length) {
-		// No local dependencies listed in package.json, exit
-		return null;
-	}
-
 	process.on('SIGINT', async (event, code) => {
 		await save_package_json(original_package_json, { cwd });
 		process.exit(code);
@@ -58,7 +53,7 @@ async function install() {
 
 install()
 	.then((packed_dependencies) => {
-		if (packed_dependencies) {
+		if (packed_dependencies.length) {
 			console.log('Local dependencies installed');
 			console.log(packed_dependencies.map(({
 				package_name,
